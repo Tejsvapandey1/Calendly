@@ -1,0 +1,36 @@
+name: Auto Commit Daily & On Push
+
+on:
+  push:
+    branches:
+      - main
+
+  schedule:
+    - cron: "0 */2 * * *"
+
+  workflow_dispatch:
+
+jobs:
+  auto-commit:
+    # Prevent infinite commit loop
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: true
+
+      - name: Update log file
+        run: |
+          echo "Update on $(date -u)" >> daily_log.txt
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "Tejsvapandey1"
+          git config user.email "tejsva.pandey2023@vitstudent.ac.in"
+
+          git add daily_log.txt
+          git commit -m "Auto update: $(date -u)" || exit 0
+          git push
