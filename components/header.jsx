@@ -3,6 +3,7 @@ import { PenBox } from "lucide-react";
 import { Button } from "./ui/button";
 import { SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { SignedIn } from "@clerk/nextjs";
+import UserMenu from "./user-menu";
 
 
 const { default: Image } = require("next/image");
@@ -34,7 +35,7 @@ export const Header = () => {
           </SignInButton>
         </SignedOut>
         <SignedIn>
-          <UserButton />
+          <UserMenu/>
         </SignedIn>
       </div>
     </nav>
