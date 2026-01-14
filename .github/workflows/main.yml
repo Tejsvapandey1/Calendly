@@ -1,5 +1,6 @@
 name: Auto Commit Daily & On Push
-
+permissions:
+  contents: write 
 on:
   push:
     branches:
