@@ -1,15 +1,17 @@
-"use client";
 import { PenBox } from "lucide-react";
 import { Button } from "./ui/button";
 import { SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { SignedIn } from "@clerk/nextjs";
 import UserMenu from "./user-menu";
+import { checkUser } from "@/lib/checkUser";
 
 
 const { default: Image } = require("next/image");
 const { default: Link } = require("next/link");
 
-export const Header = () => {
+export const Header = async() => {
+  await checkUser();
+
   return (
     <nav className="mx-auto bg-white py-2 px-4 flex shadow-md border-b-2 justify-between items-center">
       <Link href={"/"} className="flex items-center">
