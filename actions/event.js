@@ -5,7 +5,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import React from "react";
 
 const CreateEvent = async (data) => {
-  const { userId } = await auth();
+  const { userId } = await currentUser();
   console.log(userId);
 
   if (!userId) {
