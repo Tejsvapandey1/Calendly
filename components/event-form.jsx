@@ -11,8 +11,14 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Button } from "./ui/button";
+import { useFetch } from "@/hooks/useFetch";
+import CreateEvent from "@/actions/event";
+import { useRouter } from "next/navigation";
+
 
 const EventForm = ({ onSubmitForm }) => {
+  const router = useRouter()
+
   const {
     register,
     handleSubmit,
@@ -28,19 +34,28 @@ const EventForm = ({ onSubmitForm }) => {
     },
   });
 
+  const { error, loading, fn : functionEventCreate } = useFetch(CreateEvent);
+
+  const onSubmit = async (data) => {
+    await functionEventCreate(data);
+    if(!loading && !error){
+      onSubmitForm();
+    }
+
+    router.refresh();
+  };
+
   return (
     <form
       className="px-6 flex flex-col gap-4"
-      onSubmit={handleSubmit(onSubmitForm)}
+      onSubmit={handleSubmit(onSubmit)}
     >
       {/* Title */}
       <div>
         <label className="block text-sm font-medium">Event title</label>
         <Input {...register("title")} className="mt-1" />
         {errors.title && (
-          <p className="mt-1 text-sm text-red-600">
-            {errors.title.message}
-          </p>
+          <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
         )}
       </div>
 
@@ -64,9 +79,7 @@ const EventForm = ({ onSubmitForm }) => {
           {...register("duration", { valueAsNumber: true })} // ✅ FIX 3
         />
         {errors.duration && (
-          <p className="mt-1 text-sm text-red-600">
-            {errors.duration.message}
-          </p>
+          <p className="mt-1 text-sm text-red-600">{errors.duration.message}</p>
         )}
       </div>
 
@@ -79,9 +92,7 @@ const EventForm = ({ onSubmitForm }) => {
           render={({ field }) => (
             <Select
               value={field.value ? "true" : "false"}
-              onValueChange={(value) =>
-                field.onChange(value === "true")
-              }
+              onValueChange={(value) => field.onChange(value === "true")}
             >
               <SelectTrigger className="mt-1">
                 <SelectValue placeholder="Select privacy" />
@@ -100,7 +111,15 @@ const EventForm = ({ onSubmitForm }) => {
         )}
       </div>
 
-        <Button type="submit" className="mt-4">Submit</Button>
+      {error && (
+        <p className="mt-1 text-sm text-red-600">
+          {error.message || "Something went wrong"}
+        </p>
+      )}
+
+      <Button type="submit" className="mt-4" disabled={loading}>
+        {loading ? "Creating..." : "Create Event"}
+      </Button>
     </form>
   );
 };
