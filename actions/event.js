@@ -1,7 +1,7 @@
 "use server";
 import { eventsSchema } from "@/app/lib/validator";
 import { prisma as db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import React from "react";
 
 const CreateEvent = async (data) => {
@@ -34,30 +34,30 @@ const CreateEvent = async (data) => {
 };
 
 export const getUserEvents = async () => {
-   const { userId } = await auth();
-  if (!userId) {
+  const user = await currentUser();
+
+  if (!user) {
     throw new Error("Unauthorized");
   }
+
   const existingUser = await db.user.findUnique({
-    where: { clerkUserId: userId },
+    where: { clerkUserId: user.id },
   });
 
-
-  if (!existingUser) { 
+  if (!existingUser) {
     throw new Error("User not found");
   }
 
-    const events = await db.event.findMany({
-      where: { userId: existingUser.id },
-      orderBy: { createdAt: "desc" },
-      include: { 
-        _count: { select: { bookings: true } },
-      },
-    });
+  const events = await db.event.findMany({
+    where: { userId: existingUser.id },
+    orderBy: { createdAt: "desc" },
+    include: {
+      _count: { select: { bookings: true } },
+    },
+  });
 
-    console.log(events)
+  return { events, username: existingUser.username };
+};
 
-    return { events, username: existingUser.username };
-  };
 
 export default CreateEvent;
