@@ -9,6 +9,7 @@ import {
   UserButton,
 } from '@clerk/nextjs'
 import { Header } from "@/components/header";
+import CreateEventsDrawer from "@/components/create-event";
 
 export const metadata = {
   title: "Calendly",
@@ -33,6 +34,8 @@ export default function RootLayout({ children }) {
             <p>Made by Tejsva Pandey</p>
           </div>
         </footer>
+
+        <CreateEventsDrawer/>
       </body>
     </html>
     </ClerkProvider>
