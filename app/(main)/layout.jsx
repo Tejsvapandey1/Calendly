@@ -26,7 +26,7 @@ const AppLayout = ({ children }) => {
           <nav className="mt-8">
             <ul>
               {navItems.map((item, idx) => (
-                <li key={item.idx}>
+                <li key={idx}>
                   <Link
                     key={idx}
                     href={item.href}
