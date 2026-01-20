@@ -30,9 +30,11 @@ const EventCard = ({ event, username, isPublic = false }) => {
 
   const { error, loading, fn: fnDelete } = useFetch(deleteEvent);
 
-  const handleDelete = async() => {
-    await fnDelete(event.id);
-    window.location.reload();
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this event?")) {
+      await fnDelete(event.id);
+      window.location.reload();
+    }
   }
 
   return (
@@ -72,7 +74,7 @@ const EventCard = ({ event, username, isPublic = false }) => {
           disabled={loading}
           onClick={handleDelete}
         >
-          <Delete /> Delete
+          <Delete /> {loading ? "Deleting..." : "Delete Event"}
         </Button>
       </CardFooter>
     </Card>
