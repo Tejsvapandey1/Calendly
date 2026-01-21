@@ -40,6 +40,8 @@ export const getUserEvents = async () => {
     throw new Error("Unauthorized");
   }
 
+  console.log(user.id)
+
   const existingUser = await db.user.findUnique({
     where: { clerkUserId: user.id },
   });
