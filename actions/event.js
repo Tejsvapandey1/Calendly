@@ -35,7 +35,6 @@ const CreateEvent = async (data) => {
 
 export const getUserEvents = async () => {
   const user = await currentUser();
-  console.log(user.id);
 
   if (!user) {
     throw new Error("Unauthorized");
