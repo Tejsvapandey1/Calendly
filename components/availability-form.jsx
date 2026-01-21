@@ -14,6 +14,8 @@ import {
 import { timeSlots } from "@/app/(main)/availability/data";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { useFetch } from "@/hooks/useFetch";
+import { updateAvailability } from "@/actions/availability";
 
 const AvailabilityForm = ({ initialData }) => {
   // console.log(initialData);
@@ -22,7 +24,7 @@ const AvailabilityForm = ({ initialData }) => {
     register,
     handleSubmit,
     control,
-    formState: errors,
+    formState: {errors},
     setValue,
     watch,
   } = useForm({
@@ -30,8 +32,15 @@ const AvailabilityForm = ({ initialData }) => {
     defaultValues: { ...initialData },
   });
 
+  const {error,loading,fn:fnUpdate} = useFetch(updateAvailability)
+
+  const onSubmit = async(data) => {
+    console.log("Submitting data:", data);
+    await fnUpdate(data)
+  }
+
   return (
-    <form>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {[
         "monday",
         "tuesday",
@@ -145,8 +154,8 @@ const AvailabilityForm = ({ initialData }) => {
         )}
       </div>
       {errors && <div className="text-red-500 text-sm">{errors?.message}</div>}
-      <Button type="submit" >
-        Update
+      <Button type="submit" disabled={loading} >
+        {loading ? "Saving..." : "Save Availability"}
       </Button>
     </form>
   );

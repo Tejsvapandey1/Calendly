@@ -1,16 +1,17 @@
+"use server";
+
 import { currentUser } from "@clerk/nextjs/server";
 
 import { prisma as db } from "@/lib/prisma";
 
 export async function getUserAvailability() {
   const user = await currentUser();
-  
 
   if (!user) {
     throw new Error("Unauthorized");
   }
 
-  console.log(user.id)
+  console.log(user.id);
 
   const existingUser = await db.user.findUnique({
     where: {
@@ -65,4 +66,74 @@ export async function getUserAvailability() {
   });
 
   return availabilityData;
+}
+
+export async function updateAvailability(data) {
+  const user = await currentUser();
+
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  console.log(user.id);
+
+  const existingUser = await db.user.findUnique({
+    where: {
+      clerkUserId: user.id,
+    },
+    include: {
+      availability: true,
+    },
+  });
+
+  if (!existingUser) {
+    throw new Error("User not found");
+  }
+
+  const availabilityData = Object.entries(data).flatMap(
+    ([day, { isAvailable, startTime, endTime }]) => {
+      if (isAvailable) {
+        const baseDate = new Date().toISOString().split("T")[0];
+
+        return [
+          {
+            day: day.toUpperCase(),
+            startTime: new Date(`${baseDate}T${startTime}:00.000Z`),
+            endTime: new Date(`${baseDate}T${endTime}:00.000Z`),
+          },
+        ];
+      }
+
+      return [];
+    },
+  );
+
+  if(existingUser.availability) {
+    await db.availability.update({
+      where: {
+        id : existingUser.availability.id
+      },
+      data: {
+        timeGap: data.timeGap,
+        days:{
+          deleteMany: {},
+          create: availabilityData
+        }
+      }
+    })
+  } else {
+    await db.availability.create({
+      data: {
+        timeGap: data.timeGap,
+        userId: existingUser.id,
+        days: {
+          create: availabilityData
+        }
+      }
+    })
+    
+    
+  }
+
+  return { success: true };
 }
