@@ -40,7 +40,7 @@ export const getUserEvents = async () => {
     throw new Error("Unauthorized");
   }
 
-  console.log(user.id)
+  console.log(user.id);
 
   const existingUser = await db.user.findUnique({
     where: { clerkUserId: user.id },
@@ -61,14 +61,13 @@ export const getUserEvents = async () => {
   return { events, username: existingUser.username };
 };
 
-
 export const deleteEvent = async (eventId) => {
   const user = await currentUser();
   console.log("Deleting event for user:", user);
-  
+
   if (!user) {
     throw new Error("Unauthorized");
-  } 
+  }
   const existingUser = await db.user.findUnique({
     where: { clerkUserId: user.id },
   });
@@ -82,7 +81,9 @@ export const deleteEvent = async (eventId) => {
   });
 
   if (!event || event.userId !== existingUser.id) {
-    throw new Error("Event not found or you do not have permission to delete this event");
+    throw new Error(
+      "Event not found or you do not have permission to delete this event",
+    );
   }
 
   await db.event.delete({
@@ -90,6 +91,31 @@ export const deleteEvent = async (eventId) => {
   });
 
   return { success: true };
-}
+};
+
+export const getEventDetails = async (username, eventId) => {
+  const event = await db.event.findFirst({
+    where: {
+      id: eventId,
+      user: { username: username },
+    },
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+          imageUrl: true,
+          username: true,
+        },
+      },
+    },
+  });
+
+  if (!event) {
+    throw new Error("Event not found");
+  }
+
+  return event;
+};
 
 export default CreateEvent;

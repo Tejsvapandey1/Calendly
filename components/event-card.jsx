@@ -35,10 +35,22 @@ const EventCard = ({ event, username, isPublic = false }) => {
       await fnDelete(event.id);
       window.location.reload();
     }
-  }
+  };
+
+  const handleCardClick = (e) => {
+    if (e.target.tagName !== "BUTTON" && e.target.tagName !== "svg") {
+      window?.open(
+        `${window.location.origin}/${username}/${event.id}`,
+        "_blank",
+      );
+    }
+  };
 
   return (
-    <Card className={"flex flex-col justify-between cursor-pointer"}>
+    <Card
+      className={"flex flex-col justify-between cursor-pointer"}
+      onClick={handleCardClick}
+    >
       <CardHeader>
         <CardTitle className={"text-2xl"}>{event.title}</CardTitle>
         <CardDescription className={"flex justify-between"}>
