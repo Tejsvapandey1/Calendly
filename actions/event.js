@@ -3,6 +3,7 @@ import { eventsSchema } from "@/app/lib/validator";
 import { prisma as db } from "@/lib/prisma";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import React from "react";
+import { addDays, parseISO, startOfDay } from "date-fns";
 
 const CreateEvent = async (data) => {
   const user = await currentUser();
@@ -117,5 +118,118 @@ export const getEventDetails = async (username, eventId) => {
 
   return event;
 };
+
+export const getEventAvailability = async (eventId) => {
+  const event = await db.event.findUnique({
+    where: {
+      id: eventId,
+    },
+    include: {
+      user: {
+        include: {
+          availability: {
+            select: {
+              days: true,
+              timeGap: true,
+            },
+          },
+          bookings: {
+            select: {
+              startTime: true,
+              endTime: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!event || !event.user.availability) {
+    return [];
+  }
+
+  const { availability, bookings } = event.user;
+
+  const startDate = startOfDay(new Date());
+  const endDate = new Date();
+  endDate.setDate(startDate.getDate() + 30);
+
+  const availableDates = [];
+
+  for (let date = startDate; date <= endDate; date = addDays(date, 1)) {
+    const dayOfWeek = format(date, "EEEE").toLowerCase();
+    const dayAvailability = availability.days.find((d) => d.day === dayOfWeek);
+
+    if (dayAvailability) {
+      const dateStr = format(date, "yyyy-MM-dd");
+
+      const slots = generateAvailableSlots(
+        dayAvailability.startTime,
+        dayAvailability.endTime,
+        event.duration,
+        bookings,
+        dateStr,
+        availability.timeGap,
+      );
+
+      availableDates.push({
+        date: dateStr,
+        slots: slots,
+      });
+    }
+  }
+
+  return { availableDates };
+};
+
+function generateAvailableSlots(
+  startTime,
+  endTime,
+  duration,
+  bookings,
+  dateStr,
+  timeGap,
+) {
+  const slots = [];
+
+  let currentTime = parseISO(
+    `${dateStr}T${startTime.toISOString().slice(11, 16)}`,
+  );
+
+  const slotEndTime = parseISO(
+    `${dateStr}T${endTime.toISOString().slice(11, 16)}`,
+  );
+
+  const now = new Date();
+
+
+  if (format(currentTime, "yyyy-MM-dd") === dateStr) {
+    if (isBefore(currentTime, now)) {
+      currentTime = addMinutes(now, timeGap);
+    }
+  }
+
+  while (currentTime < slotEndTime) {
+    const slotEnd = addMinutes(currentTime, duration);
+
+
+    if (slotEnd > slotEndTime) break;
+
+    const isSlotAvailable = !bookings.some((booking) => {
+      const bookingStart = new Date(booking.startTime);
+      const bookingEnd = new Date(booking.endTime);
+
+
+      return currentTime < bookingEnd && slotEnd > bookingStart;
+    });
+
+    if (isSlotAvailable) {
+      slots.push(format(currentTime, "HH:mm"));
+    }
+
+    currentTime =  slotEnd
+  }
+  return slots;
+}
 
 export default CreateEvent;

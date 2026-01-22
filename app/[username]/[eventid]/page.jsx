@@ -3,8 +3,9 @@ import EventCard from "@/components/event-card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { notFound } from "next/navigation";
-import React from "react";
+import React, { Suspense } from "react";
 import EventDetails from "./_components/event-details";
+import BookingForm from "./_components/booking-form";
 
 export async function generateMetadata({ params }) {
   const userFromParams = await params;
@@ -38,9 +39,9 @@ const EventPage = async ({ params }) => {
   return (
     <div className="flex flex-col justify-center lg:flex-row px-4 py-8">
       <EventDetails event={event} />
-      {/* <Suspense fallback={<div>Loading booking form...</div>}>
-    <BookingForm/>
-    </Suspense> */}
+      <Suspense fallback={<div>Loading booking form...</div>}>
+        <BookingForm />
+      </Suspense>
     </div>
   );
 };
