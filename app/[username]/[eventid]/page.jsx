@@ -1,4 +1,4 @@
-import { getEventDetails } from "@/actions/event";
+import { getEventAvailability, getEventDetails } from "@/actions/event";
 import EventCard from "@/components/event-card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
@@ -32,6 +32,11 @@ const EventPage = async ({ params }) => {
     userFromParams.username,
     userFromParams.eventid,
   );
+  
+
+  const availability = await getEventAvailability(userFromParams.eventid);
+
+  console.log("this is from availability \n",availability)
 
   if (!event) {
     notFound();
@@ -40,7 +45,7 @@ const EventPage = async ({ params }) => {
     <div className="flex flex-col justify-center lg:flex-row px-4 py-8">
       <EventDetails event={event} />
       <Suspense fallback={<div>Loading booking form...</div>}>
-        <BookingForm />
+        <BookingForm event={event} availability={availability}/>
       </Suspense>
     </div>
   );

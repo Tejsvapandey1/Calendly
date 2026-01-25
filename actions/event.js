@@ -1,9 +1,9 @@
 "use server";
 import { eventsSchema } from "@/app/lib/validator";
 import { prisma as db } from "@/lib/prisma";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import React from "react";
-import { addDays, parseISO, startOfDay } from "date-fns";
+import { currentUser } from "@clerk/nextjs/server";
+import { addDays, parseISO, startOfDay,format } from "date-fns";
+
 
 const CreateEvent = async (data) => {
   const user = await currentUser();
@@ -147,6 +147,8 @@ export const getEventAvailability = async (eventId) => {
   if (!event || !event.user.availability) {
     return [];
   }
+
+  console.log(event);
 
   const { availability, bookings } = event.user;
 

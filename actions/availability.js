@@ -11,7 +11,7 @@ export async function getUserAvailability() {
     throw new Error("Unauthorized");
   }
 
-  console.log(user.id);
+  // console.log(user.id);
 
   const existingUser = await db.user.findUnique({
     where: {
@@ -75,7 +75,7 @@ export async function updateAvailability(data) {
     throw new Error("Unauthorized");
   }
 
-  console.log(user.id);
+  // console.log(Object.entries(data));
 
   const existingUser = await db.user.findUnique({
     where: {
@@ -92,47 +92,43 @@ export async function updateAvailability(data) {
 
   const availabilityData = Object.entries(data).flatMap(
     ([day, { isAvailable, startTime, endTime }]) => {
-      if (isAvailable) {
-        const baseDate = new Date().toISOString().split("T")[0];
+      if (!isAvailable) return [];
 
-        return [
-          {
-            day: day.toUpperCase(),
-            startTime: new Date(`${baseDate}T${startTime}:00.000Z`),
-            endTime: new Date(`${baseDate}T${endTime}:00.000Z`),
-          },
-        ];
-      }
+      const baseDate = new Date().toISOString().split("T")[0];
 
-      return [];
+      return [
+        {
+          day: day.charAt(0).toUpperCase() + day.slice(1), 
+          startTime: new Date(`${baseDate}T${startTime}:00.000Z`),
+          endTime: new Date(`${baseDate}T${endTime}:00.000Z`),
+        },
+      ];
     },
   );
 
-  if(existingUser.availability) {
+  if (existingUser.availability) {
     await db.availability.update({
       where: {
-        id : existingUser.availability.id
+        id: existingUser.availability.id,
       },
       data: {
         timeGap: data.timeGap,
-        days:{
+        days: {
           deleteMany: {},
-          create: availabilityData
-        }
-      }
-    })
+          create: availabilityData,
+        },
+      },
+    });
   } else {
     await db.availability.create({
       data: {
         timeGap: data.timeGap,
         userId: existingUser.id,
         days: {
-          create: availabilityData
-        }
-      }
-    })
-    
-    
+          create: availabilityData,
+        },
+      },
+    });
   }
 
   return { success: true };

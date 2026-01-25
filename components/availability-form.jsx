@@ -17,14 +17,14 @@ import { Button } from "./ui/button";
 import { useFetch } from "@/hooks/useFetch";
 import { updateAvailability } from "@/actions/availability";
 
-const AvailabilityForm = ({ initialData }) => {
+const AvailabilityForm =  ({ initialData }) => {
   // console.log(initialData);
 
   const {
     register,
     handleSubmit,
     control,
-    formState: {errors},
+    formState: { errors },
     setValue,
     watch,
   } = useForm({
@@ -32,12 +32,16 @@ const AvailabilityForm = ({ initialData }) => {
     defaultValues: { ...initialData },
   });
 
-  const {error,loading,fn:fnUpdate} = useFetch(updateAvailability)
+  const { error, loading, fn: fnUpdate } = useFetch(updateAvailability);
 
-  const onSubmit = async(data) => {
-    console.log("Submitting data:", data);
-    await fnUpdate(data)
+  if(!fnUpdate){
+    console.log("FUnction hi nhi aaya")
   }
+
+  const onSubmit = async (data) => {
+    console.log("Submitting data:", data);
+    await fnUpdate(data);
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -154,7 +158,7 @@ const AvailabilityForm = ({ initialData }) => {
         )}
       </div>
       {errors && <div className="text-red-500 text-sm">{errors?.message}</div>}
-      <Button type="submit" disabled={loading} >
+      <Button type="submit" disabled={loading}>
         {loading ? "Saving..." : "Save Availability"}
       </Button>
     </form>
