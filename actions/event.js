@@ -2,8 +2,7 @@
 import { eventsSchema } from "@/app/lib/validator";
 import { prisma as db } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
-import { addDays, parseISO, startOfDay,format } from "date-fns";
-
+import { addDays, parseISO, startOfDay, format ,isBefore, addMinutes} from "date-fns";
 
 const CreateEvent = async (data) => {
   const user = await currentUser();
@@ -148,9 +147,11 @@ export const getEventAvailability = async (eventId) => {
     return [];
   }
 
-  console.log(event);
+  // console.log("this is from getEventAvailability",event);
 
   const { availability, bookings } = event.user;
+
+  console.log("this is availability \n", availability);
 
   const startDate = startOfDay(new Date());
   const endDate = new Date();
@@ -159,7 +160,8 @@ export const getEventAvailability = async (eventId) => {
   const availableDates = [];
 
   for (let date = startDate; date <= endDate; date = addDays(date, 1)) {
-    const dayOfWeek = format(date, "EEEE").toLowerCase();
+    const dayOfWeek = format(date, "EEEE"); // ✅ matches enum
+
     const dayAvailability = availability.days.find((d) => d.day === dayOfWeek);
 
     if (dayAvailability) {
@@ -176,10 +178,12 @@ export const getEventAvailability = async (eventId) => {
 
       availableDates.push({
         date: dateStr,
-        slots: slots,
+        slots,
       });
     }
   }
+
+  console.log("this is what i am sending", availableDates);
 
   return { availableDates };
 };
@@ -204,7 +208,6 @@ function generateAvailableSlots(
 
   const now = new Date();
 
-
   if (format(currentTime, "yyyy-MM-dd") === dateStr) {
     if (isBefore(currentTime, now)) {
       currentTime = addMinutes(now, timeGap);
@@ -214,13 +217,11 @@ function generateAvailableSlots(
   while (currentTime < slotEndTime) {
     const slotEnd = addMinutes(currentTime, duration);
 
-
     if (slotEnd > slotEndTime) break;
 
     const isSlotAvailable = !bookings.some((booking) => {
       const bookingStart = new Date(booking.startTime);
       const bookingEnd = new Date(booking.endTime);
-
 
       return currentTime < bookingEnd && slotEnd > bookingStart;
     });
@@ -229,7 +230,7 @@ function generateAvailableSlots(
       slots.push(format(currentTime, "HH:mm"));
     }
 
-    currentTime =  slotEnd
+    currentTime = slotEnd;
   }
   return slots;
 }

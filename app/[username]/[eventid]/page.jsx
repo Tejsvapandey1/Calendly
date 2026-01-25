@@ -36,7 +36,7 @@ const EventPage = async ({ params }) => {
 
   const availability = await getEventAvailability(userFromParams.eventid);
 
-  console.log("this is from availability \n",availability)
+  // console.log("this is from availability \n",availability)
 
   if (!event) {
     notFound();

@@ -1,11 +1,10 @@
-"use client"
+"use client";
 import { bookingSchema } from "@/app/lib/validator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import "react-day-picker/style.css";
 import { DayPicker } from "react-day-picker";
-
 
 const BookingForm = ({ event, availability }) => {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -19,7 +18,11 @@ const BookingForm = ({ event, availability }) => {
     resolver: zodResolver(bookingSchema),
   });
 
-  const availableDays = availability.map((day) => new Date(day.date));
+  console.log("this is from bookingForm", availability);
+
+  const availableDays = availability.availableDates.map(
+    (day) => new Date(day.date),
+  );
 
   return (
     <div>
@@ -31,6 +34,7 @@ const BookingForm = ({ event, availability }) => {
             setSelectedDate(date);
             setSelectedTime(null);
           }}
+          disabled={[{ before: new Date() }]}
           modifiers={{
             available: availableDays,
           }}
