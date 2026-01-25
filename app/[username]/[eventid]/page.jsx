@@ -28,25 +28,28 @@ export async function generateMetadata({ params }) {
 
 const EventPage = async ({ params }) => {
   const userFromParams = await params;
+
   const event = await getEventDetails(
     userFromParams.username,
     userFromParams.eventid,
   );
-  
 
   const availability = await getEventAvailability(userFromParams.eventid);
-
-  // console.log("this is from availability \n",availability)
 
   if (!event) {
     notFound();
   }
+
   return (
-    <div className="flex flex-col justify-center lg:flex-row px-4 py-8">
-      <EventDetails event={event} />
-      <Suspense fallback={<div>Loading booking form...</div>}>
-        <BookingForm event={event} availability={availability}/>
-      </Suspense>
+    <div className="flex justify-center content-center px-4 py-10 bg-gray-50 mt-4">
+      <div className="w-80 max-w-6xl">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+          <EventDetails event={event} />
+          <Suspense fallback={<div>Loading booking form...</div>}>
+            <BookingForm event={event} availability={availability} />
+          </Suspense>
+        </div>
+      </div>
     </div>
   );
 };
