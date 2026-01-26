@@ -119,6 +119,7 @@ export const getEventDetails = async (username, eventId) => {
 };
 
 export const getEventAvailability = async (eventId) => {
+  console.log("got in the event")
   const event = await db.event.findUnique({
     where: {
       id: eventId,
@@ -147,7 +148,7 @@ export const getEventAvailability = async (eventId) => {
     return [];
   }
 
-  // console.log("this is from getEventAvailability",event);
+  console.log("this is from getEventAvailability event",event);
 
   const { availability, bookings } = event.user;
 

@@ -10,7 +10,7 @@ const { default: Image } = require("next/image");
 const { default: Link } = require("next/link");
 
 export const Header = async() => {
-  // await checkUser();
+  await checkUser();
 
   return (
     <nav className="mx-auto bg-white py-2 px-4 flex shadow-md border-b-2 justify-between items-center">

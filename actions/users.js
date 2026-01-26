@@ -20,6 +20,8 @@ export async function updateUsername(username) {
     throw new Error("Username already taken");
   }
 
+  console.log(existingUsername)
+
   await db.user.update({
     where: {
       clerkUserId: userId,
