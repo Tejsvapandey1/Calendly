@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import { bookingSchema } from "@/app/lib/validator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
@@ -55,7 +55,7 @@ const BookingForm = ({ event, availability }) => {
   const onSubmit = async (data) => {
     console.log(data);
 
-    if (!selectedDate || selectedTime) {
+    if (!selectedDate || !selectedTime) {
       console.error("Date and Time is not Selected");
       return;
     }

@@ -1,12 +1,14 @@
-const { prisma: db } = require("@/lib/prisma");
-const { clerkClient } = require("@clerk/nextjs/server");
-const { google } = require("googleapis");
+"use server";
+import { prisma as db } from "@/lib/prisma";
+import { clerkClient } from "@clerk/nextjs/server";
+import { google } from "googleapis";
 
 export const createBooking = async (bookingData) => {
   try {
+    console.log("Bookingdata event id", bookingData.eventId);
     const event = await db.event.findUnique({
       where: {
-        id: bookingData.eventid,
+        id: bookingData.eventId,
       },
       include: {
         user: true,
@@ -17,16 +19,25 @@ export const createBooking = async (bookingData) => {
       throw new Error("Event not found");
     }
 
-    const { data } = clerkClient.users.getUserOauthAccessToken(
+    const clerk = await clerkClient();
+
+    const tokens = await clerk.users.getUserOauthAccessTokenList(
       event.user.clerkUserId,
       "oauth_google",
     );
 
-    const token = data[0]?.token;
+    const token = tokens?.data?.[0]?.token;
 
     if (!token) {
       throw new Error("Event creator has not connected Google Calendar");
     }
+
+    console.log(
+      await clerk.users.getUserOauthAccessTokenList(
+        event.user.clerkUserId,
+        "oauth_google",
+      ),
+    );
 
     const oauth2Client = new google.auth.OAuth2();
     oauth2Client.setCredentials({ access_token: token });
@@ -68,7 +79,7 @@ export const createBooking = async (bookingData) => {
     });
 
     return { success: true, booking, meetLink };
-  } catch (e) {
+  } catch (error) {
     console.error("Error creating booking:", error);
     return { success: false, error: error.message };
   }

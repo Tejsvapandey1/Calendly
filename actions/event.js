@@ -6,7 +6,7 @@ import { addDays, parseISO, startOfDay, format ,isBefore, addMinutes} from "date
 
 const CreateEvent = async (data) => {
   const user = await currentUser();
-  console.log(user.id);
+  // console.log(user.id);
 
   if (!user) {
     throw new Error("Unauthorized");
@@ -28,7 +28,7 @@ const CreateEvent = async (data) => {
     },
   });
 
-  console.log("Created event:", event);
+  // console.log("Created event:", event);
 
   return event;
 };
@@ -40,7 +40,7 @@ export const getUserEvents = async () => {
     throw new Error("Unauthorized");
   }
 
-  console.log(user.id);
+  // console.log(user.id);
 
   const existingUser = await db.user.findUnique({
     where: { clerkUserId: user.id },
@@ -63,7 +63,7 @@ export const getUserEvents = async () => {
 
 export const deleteEvent = async (eventId) => {
   const user = await currentUser();
-  console.log("Deleting event for user:", user);
+  // console.log("Deleting event for user:", user);
 
   if (!user) {
     throw new Error("Unauthorized");
@@ -119,7 +119,7 @@ export const getEventDetails = async (username, eventId) => {
 };
 
 export const getEventAvailability = async (eventId) => {
-  console.log("got in the event")
+  // console.log("got in the event")
   const event = await db.event.findUnique({
     where: {
       id: eventId,
@@ -148,11 +148,11 @@ export const getEventAvailability = async (eventId) => {
     return [];
   }
 
-  console.log("this is from getEventAvailability event",event);
+  // console.log("this is from getEventAvailability event",event);
 
   const { availability, bookings } = event.user;
 
-  console.log("this is availability \n", availability);
+  // console.log("this is availability \n", availability);
 
   const startDate = startOfDay(new Date());
   const endDate = new Date();
@@ -184,7 +184,7 @@ export const getEventAvailability = async (eventId) => {
     }
   }
 
-  console.log("this is what i am sending", availableDates);
+  // console.log("this is what i am sending", availableDates);
 
   return { availableDates };
 };

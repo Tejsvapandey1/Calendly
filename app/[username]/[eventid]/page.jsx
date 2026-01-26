@@ -1,3 +1,4 @@
+
 import { getEventAvailability, getEventDetails } from "@/actions/event";
 import EventCard from "@/components/event-card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
