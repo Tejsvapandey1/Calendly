@@ -20,24 +20,21 @@ export const createBooking = async (bookingData) => {
     }
 
     const clerk = await clerkClient();
+    
 
-    const tokens = await clerk.users.getUserOauthAccessTokenList(
+     // Get the event creator's Google OAuth token from Clerk
+    const { data } = await clerk.users.getUserOauthAccessToken(
       event.user.clerkUserId,
-      "oauth_google",
+      "google"
     );
 
-    const token = tokens?.data?.[0]?.token;
+    // console.log("data from auth fxn",data);
+
+    const token = data[0]?.token;
 
     if (!token) {
       throw new Error("Event creator has not connected Google Calendar");
     }
-
-    console.log(
-      await clerk.users.getUserOauthAccessTokenList(
-        event.user.clerkUserId,
-        "oauth_google",
-      ),
-    );
 
     const oauth2Client = new google.auth.OAuth2();
     oauth2Client.setCredentials({ access_token: token });

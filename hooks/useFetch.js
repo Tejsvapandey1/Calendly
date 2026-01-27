@@ -1,7 +1,7 @@
 const { useState } = require("react");
 
 export const useFetch = (cb) => {
-
+  const [data, setData] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -9,8 +9,8 @@ export const useFetch = (cb) => {
     setLoading(true);
     setError(null);
     try {
-      const result = await cb(...args);
-     
+      const response = await cb(...args);
+     setData(response);
       setError(null);
     } catch (err) {
       setError(err);
@@ -21,5 +21,5 @@ export const useFetch = (cb) => {
 
 
 
-  return {  loading, error, fn };
+  return {data,  loading, error, fn };
 };

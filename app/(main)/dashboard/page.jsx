@@ -11,6 +11,8 @@ import { usernameSchema } from "@/app/lib/validator";
 import { useFetch } from "@/hooks/useFetch";
 import { updateUsername } from "@/actions/users";
 import { BarLoader } from "react-spinners";
+import { getLatestUpdates } from "@/actions/dashboard";
+import { format } from "date-fns";
 
 const page = () => {
   const { user, isLoaded } = useUser();
@@ -24,11 +26,6 @@ const page = () => {
     resolver: zodResolver(usernameSchema),
   });
 
-  useEffect(() => {
-    setValue("username", user?.username || "");
-  }, [isLoaded]);
-
-
   const {
     loading,
     error,
@@ -39,13 +36,50 @@ const page = () => {
     await functionUpdateUsername(data.username);
   };
 
+  useEffect(() => {
+    setValue("username", user?.username);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded]);
+
+  const {
+    loading: loadingUpdates,
+    data: upcomingMeetings = [],
+    fn: fnUpdates,
+  } = useFetch(getLatestUpdates);
+
+  useEffect(() => {
+    (async () => await fnUpdates())();
+  }, []);
+
+  const cleanMeetings = Array.isArray(upcomingMeetings)
+    ? upcomingMeetings.slice().map((m) => ({ ...m }))
+    : [];
+
+  console.log("upcoming Meetings", upcomingMeetings);
+
   return (
     <div className="space-y-8">
       <Card>
         <CardHeader>
           <CardTitle>Welcome {user?.firstName}</CardTitle>
         </CardHeader>
-        {/* latest update */}
+        <CardContent>
+          {loadingUpdates ? (
+            <p>Loading updates...</p>
+          ) : cleanMeetings.length > 0 ? (
+            <ul className="list-disc pl-5 space-y-1 font-light">
+              {cleanMeetings.map((meeting) => (
+                <li key={meeting.id}>
+                  <strong>{meeting.event.title}</strong> on{" "}
+                  {format(new Date(meeting.startTime), "MMM d, yyyy h:mm a")}{" "}
+                  with {meeting.name}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No upcoming meetings</p>
+          )}
+        </CardContent>
       </Card>
 
       <Card>
@@ -56,7 +90,9 @@ const page = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <div className="flex items-center gap-2">
-                <span>{window.location.origin}/ </span>
+                <span>
+                  {typeof window !== "undefined" ? window.location.origin : ""}/
+                </span>
                 <Input {...register("username")} placeholder="username" />
               </div>
               {errors.username && (
@@ -66,9 +102,7 @@ const page = () => {
               )}
 
               {error && (
-                <p className="text-sm text-red-600 mt-1">
-                  {error.message}
-                </p>
+                <p className="text-sm text-red-600 mt-1">{error.message}</p>
               )}
             </div>
             {loading && <BarLoader width="100%" color="#36d7b7" />}
