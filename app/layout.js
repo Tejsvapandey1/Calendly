@@ -10,6 +10,7 @@ import {
 } from "@clerk/nextjs";
 import { Header } from "@/components/header";
 import CreateEventsDrawer from "@/components/create-event";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Calendly",
@@ -37,8 +38,10 @@ export default function RootLayout({ children }) {
               <p>Made by Tejsva Pandey</p>
             </div>
           </footer>
+        <Suspense fallback={null}>
 
           <CreateEventsDrawer />
+        </Suspense>
         </body>
       </html>
     </ClerkProvider>
