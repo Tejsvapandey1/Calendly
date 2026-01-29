@@ -27,11 +27,4 @@ jobs:
         run: |
           echo "Update on $(date -u)" >> daily_log.txt
 
-      - name: Commit and push changes
-        run: |
-          git config user.name "Tejsvapandey1"
-          git config user.email "tejsva.pandey2023@vitstudent.ac.in"
-
-          git add daily_log.txt
-          git commit -m "Auto update: $(date -u)" || exit 0
-          git push
+     
