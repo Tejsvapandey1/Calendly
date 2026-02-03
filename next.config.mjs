@@ -3,7 +3,7 @@ const nextConfig = {
   /* config options here */
   output: "standalone",
   experimental: {
-    serverComponentsExternalPackages: ["@prisma/client"],
+    serverExternalPackages: ["@prisma/client"],
     turbopackUseSystemTlsCerts: true,
   },
 };
