@@ -1,9 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* config options here */
-  experimental:{
-    turbopackUseSystemTlsCerts: true
-  }
+  output: "standalone",
+  experimental: {
+    serverComponentsExternalPackages: ["@prisma/client"],
+    turbopackUseSystemTlsCerts: true,
+    serverCom,
+  },
 };
 
 export default nextConfig;
