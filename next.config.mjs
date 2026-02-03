@@ -5,7 +5,6 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["@prisma/client"],
     turbopackUseSystemTlsCerts: true,
-    serverCom,
   },
 };
 
