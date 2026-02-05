@@ -16,6 +16,7 @@ const Events = async () => {
   if (events.length === 0) {
     return <p>You haven&apos;t created any events yet.</p>;
   }
+  console.log(events)
   return (
     <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
       {events?.map((event) => (

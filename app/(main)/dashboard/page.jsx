@@ -33,6 +33,7 @@ const page = () => {
   } = useFetch(updateUsername);
 
   const onSubmit = async (data) => {
+    console.log("Submitting")
     await functionUpdateUsername(data.username);
   };
 
